@@ -2,56 +2,51 @@
 
 @section('content')
 
-<h1 class="mb-4 display-6 text-primary">👥 Daftar Karyawan</h1>
-    
-<div id="user-list">
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Daftar Karyawan</h1>
 
-    {{-- Header dan Tombol Tambah --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <input type="text" class="form-control w-25" placeholder="Cari Nama atau Email Karyawan...">
-        {{-- PASTIKAN RUTE CREATE INI ADA DI routes/web.php --}}
-        <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-lg shadow-sm">
-            <i class="fas fa-user-plus me-2"></i> Tambah Karyawan Baru
-        </a>
-    </div>
+    <a href="{{ route('admin.users.create') }}" class="btn btn-primary mb-3">
+        Tambah Karyawan Baru
+    </a>
 
-    {{-- Kartu Tabel --}}
-    <div class="card p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead style="background-color: #E3F2FD;">
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Nama Karyawan</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Departemen</th>
-                        <th scope="col">Status Akun</th>
-                        <th scope="col">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{-- Pastikan variabel $users dikirim dari rute --}}
-                    @forelse ($users as $user)
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <th scope="col">No</th>
+                            <th scope="col">Nama</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Departemen</th>
+                            <th scope="col">Peran</th>
+                            <th scope="col">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{-- LOOPING DATA USERS --}}
+                        {{-- 👇 Pastikan nama variabelnya $users --}}
+                        @foreach ($users as $user) 
+                        <tr>
+                            <td>{{ $user->id }}</td>
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->department }}</td>
-                            <td><span class="badge bg-success">Aktif</span></td>
+                            <td>{{ $user->role }}</td>
                             <td>
-                                <a href="#" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <a href="#" class="btn btn-sm btn-outline-secondary">Nonaktifkan</a>
+                                <a href="#" class="btn btn-sm btn-info">Edit</a>
+                                <form action="#" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Hapus</button>
+                                </form>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-4 text-muted">
-                                Belum ada data karyawan yang terdaftar.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                        @endforeach
+                        {{-- AKHIR LOOPING --}}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

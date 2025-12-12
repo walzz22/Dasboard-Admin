@@ -1,8 +1,20 @@
-@extends('layout.app') 
+@extends('layout.app')
 
 @section('content')
 
 <h1 class="mb-4 display-6 text-primary">➕ Tambah Karyawan Baru</h1>
+
+{{-- 👇 INI ADALAH BAGIAN YANG HILANG: PENAMPIL ERROR --}}
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <strong>Gagal Menyimpan!</strong> Silakan cek input berikut:
+        <ul class="mb-0">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
 <div class="card shadow-sm">
     <div class="card-body p-4">
@@ -11,60 +23,67 @@
             @csrf
             
             <div class="row g-4">
-                
-                {{-- Kolom Kiri: Informasi Pribadi Karyawan --}}
+                {{-- Kolom Kiri --}}
                 <div class="col-lg-6">
-                    <h5 class="mb-3 text-primary">Informasi Dasar Karyawan</h5>
+                    <h5 class="mb-3 text-primary">Informasi Dasar</h5>
 
                     <div class="mb-3">
-                        <label for="name" class="form-label fw-bold">Nama Lengkap <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="name" name="name" required placeholder="Contoh: Budi Santoso">
+                        <label class="form-label fw-bold">Nama Lengkap *</label>
+                        {{-- value="{{ old('name') }}" berguna agar saat error, tulisan tidak hilang --}}
+                        <input type="text" class="form-control" name="name" required value="{{ old('name') }}">
                     </div>
                     
                     <div class="mb-3">
-                        <label for="email" class="form-label fw-bold">Email Kantor <span class="text-danger">*</span></label>
-                        <input type="email" class="form-control" id="email" name="email" required placeholder="budi@kantor.com">
+                        <label class="form-label fw-bold">Email Kantor *</label>
+                        <input type="email" class="form-control" name="email" required value="{{ old('email') }}">
                     </div>
 
                     <div class="mb-3">
-                        <label for="phone" class="form-label fw-bold">Nomor Telepon</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="e.g., 0812xxxxxx">
+                        <label class="form-label fw-bold">Nomor Telepon</label>
+                        <input type="text" class="form-control" name="phone" value="{{ old('phone') }}">
                     </div>
                 </div>
                 
-                {{-- Kolom Kanan: Pengaturan Akun & Tugas Karyawan --}}
+                {{-- Kolom Kanan --}}
                 <div class="col-lg-6">
-                    <h5 class="mb-3 text-primary">Pengaturan Tugas & Akun</h5>
+                    <h5 class="mb-3 text-primary">Pengaturan Akun</h5>
                     
                     <div class="mb-3">
-                        <label for="department" class="form-label fw-bold">Departemen <span class="text-danger">*</span></label>
-                        <select class="form-select" id="department" name="department" required>
+                        <label class="form-label fw-bold">Departemen *</label>
+                        <select class="form-select" name="department" required>
                             <option value="" disabled selected>Pilih Departemen</option>
                             <option value="Admin">Admin / Operasional</option>
                             <option value="Marketing">Marketing</option>
-                            <option value="HRD">HRD</option>
+                            <option value="Teknologi">Teknologi / IT</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label for="password" class="form-label fw-bold">Kata Sandi Awal <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="password" name="password" required>
+                        <label class="form-label fw-bold">Peran (Role) *</label>
+                        <select class="form-select" name="role" required>
+                            <option value="staff" selected>Staff Biasa</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Kata Sandi Awal *</label>
+                        <input type="password" class="form-control" name="password" required>
+                        <div class="form-text">Minimal 8 karakter.</div>
                     </div>
                 </div>
-                
             </div>
             
             <hr class="my-4">
             
             <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary btn-lg me-3 shadow-sm">
-                    <i class="fas fa-user-plus me-2"></i> Tambah Karyawan
+                <button type="submit" class="btn btn-primary btn-lg me-3">
+                    Simpan Karyawan
                 </button>
-                <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-lg">Batal</a>
+                <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-lg">Batal</a>
             </div>
             
         </form>
-        
     </div>
 </div>
 

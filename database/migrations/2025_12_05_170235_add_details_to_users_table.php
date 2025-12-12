@@ -8,21 +8,34 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Menambahkan kolom baru ke tabel users.
      */
-    public function up()
-{
-    Schema::table('users', function (Blueprint $table) {
-        // Menambahkan kolom baru ke tabel users yang sudah ada
-        $table->string('department')->nullable()->after('email');
-        $table->string('role')->default('Staff')->after('department');
-        $table->string('phone')->nullable()->after('name');
-    });
-}
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            // Cek dulu apakah kolom sudah ada agar tidak error duplikat
+            if (!Schema::hasColumn('users', 'phone')) {
+                $table->string('phone')->nullable()->after('email');
+            }
 
-public function down()
-{
-    Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['department', 'role', 'phone']);
-    });
-}
+            if (!Schema::hasColumn('users', 'department')) {
+                $table->string('department')->nullable()->after('email'); // Sesuaikan posisi jika 'phone' belum ada
+            }
+
+            if (!Schema::hasColumn('users', 'role')) {
+                $table->string('role')->default('staff')->after('email');
+            }
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     * Menghapus kolom jika migrasi dibatalkan (rollback).
+     */
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['phone', 'department', 'role']);
+        });
+    }
 };

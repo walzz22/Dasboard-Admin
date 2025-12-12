@@ -11,9 +11,6 @@ class Product extends Model // Baris 9
 // ...
     use HasFactory, HasUuids;
 
-    protected $keyType = 'string';
-    public $incrementing = false;
-    
     // WAJIB ADA DAN LENGKAP
     protected $fillable = [
         'name', 
