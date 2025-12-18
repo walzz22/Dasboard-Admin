@@ -14,13 +14,23 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name'); // Nama Produk
-            $table->decimal('commission', 8, 2); // Komisi (misal: 10.50)
-            $table->text('description')->nullable(); // Deskripsi (boleh kosong)
-            $table->string('status')->default('Aktif'); // Status
-            $table->string('image')->nullable(); // Foto Produk
-            $table->timestamps(); // Created_at & Updated_at
-        });
+           // Informasi Dasar
+        $table->string('name'); // Nama Produk
+        $table->string('sku')->nullable(); // SKU (Kode Unik), boleh kosong
+        $table->string('category'); // Kategori (E-course, Software, dll)
+        $table->string('status')->default('Aktif'); // Status (Aktif/Draft)
+
+        // Harga & Komisi
+        $table->decimal('price', 15, 2); // Harga (Desimal untuk uang)
+        $table->string('commission_type')->default('percent'); // Tipe: 'percent' atau 'fixed'
+        $table->decimal('commission', 15, 2); // Nilai komisinya
+
+        // Detail & Media
+        $table->text('link')->nullable(); // URL Landing Page
+        $table->string('image')->nullable(); // Path gambar yang diupload
+        
+        $table->timestamps(); // Created_at & Updated_at
+    });
     }
 
     /**

@@ -3,25 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\In;
 
 class ProductController extends Controller
 {
     /**
-     * Menampilkan daftar semua produk.
+     * Menampilkan daftar produk (Index)
      */
-        public function index()
+    public function index()
     {
-        // Ambil semua data produk dari database, urutkan dari yang terbaru
-        $products = Product::latest()->get(); 
-        
-        // Kirim variabel $products yang berisi data asli ke view
+        // Menggunakan paginate agar halaman tidak berat saat data banyak
+        $products = Product::latest()->paginate(10);
         return view('admin.products.index', compact('products'));
     }
 
     /**
-     * Menampilkan formulir untuk membuat produk baru.
+     * Menampilkan Form Tambah Produk
      */
     public function create()
     {
@@ -29,32 +29,70 @@ class ProductController extends Controller
     }
 
     /**
-     * Menyimpan data produk baru dari formulir.
+     * Memproses Penyimpanan Data (Store)
      */
-        public function store(Request $request)
-    {
-        // 1. Validasi Data (Agar data yang masuk sesuai aturan)
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'commission' => 'required|numeric',
-            'description' => 'nullable|string',
-            'status' => 'required|string',
-        ]);
+  public function store(Request $request)
+{
+    // 1. Validasi Dasar (Hapus aturan 'image' dan 'mimes' di sini)
+    $validatedData = $request->validate([
+        'name'            => 'required|string|max:255',
+        'sku'             => 'nullable|string|max:100',
+        'category'        => 'required|string',
+        'status'          => 'required',
+        'price'           => 'required|numeric',
+        'commission_type' => 'required',
+        'commission'      => 'required|numeric',
+        'link'            => 'nullable|string',
+        // Kita hanya cek apakah ini benar-benar file dan ukurannya tidak lewat 5MB
+        'image'           => 'nullable|file|max:5120', 
+    ]);
 
-        // 2. Simpan ke Database menggunakan Model
-        Product::create([
-            'name' => $request->name,
-            'commission' => $request->commission,
-            'description' => $request->description,
-            'status' => $request->status,
-            // 'image' => ... (Kita skip upload gambar dulu agar simpel)
-        ]);
+    // 2. Logika Pengecekan Gambar Manual (Anti-Gagal)
+    if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        
+        // Ambil ekstensi asli file (misal: jpg, png)
+        $extension = strtolower($file->getClientOriginalExtension());
+        
+        // Daftar ekstensi yang kita izinkan
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
-        // 3. Kembali ke Halaman Index dengan Pesan Sukses
-        return redirect()->route('admin.products.index')
-                        ->with('success', 'Produk berhasil ditambahkan ke Database Laragon!');
+        // Cek apakah ekstensi file ada di daftar aman
+        if (!in_array($extension, $allowedExtensions)) {
+            return back()->withErrors([
+                'image' => 'File gagal diupload! Ekstensi .' . $extension . ' tidak diizinkan. Gunakan JPG, PNG, atau JPEG.'
+            ])->withInput();
+        }
+
+        // Jika lolos cek ekstensi, simpan filenya
+        $path = $file->store('products', 'public');
+        $validatedData['image'] = $path;
     }
 
-    // Fungsi edit, update, destroy, dan show akan diisi nanti.
-    // ...
+    // 3. Simpan ke Database
+    \App\Models\Product::create($validatedData);
+
+    return redirect()->route('admin.products.index')->with('success', 'Produk berhasil ditambahkan!');
+}
+
+    /**
+     * Menghapus Produk (Destroy)
+     */
+    public function destroy($id)
+    {
+        $product = Product::findOrFail($id);
+
+        // Hapus gambar dari penyimpanan jika ada (agar tidak menumpuk sampah file)
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $product->delete();
+
+        return redirect()
+            ->route('admin.products.index')
+            ->with('success', 'Produk berhasil dihapus!');
+    }
+    
+    // Method edit() dan update() bisa ditambahkan nanti di sini...
 }
