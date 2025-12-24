@@ -3,6 +3,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\InfoController;
 use App\Http\Controllers\Admin\UserController;
+use App\Livewire\Admin\CreateInfo;
 use Illuminate\Support\Facades\Route;
 
 // Tambahkan rute ini di routes/web.php
@@ -14,17 +15,11 @@ Route::redirect('/admin', '/admin/dashboard');
 // Dashboard
 
 Route::prefix('admin')->name('admin.')->group(function () {
-
-    // Modul Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Halaman Utama Tabel
+    Route::get('/info', [InfoController::class, 'index'])->name('info.index');
     
-    // Modul Produk Afiliasi
-    Route::resource('products', ProductController::class);
-    
-    // Modul Info Kantor
-    Route::resource('info', InfoController::class);
-
-    // Modul Karyawan
-    Route::resource('users', UserController::class);
-
+    // Halaman Form Tambah (Menggunakan Livewire)
+    Route::get('/info/create', function() {
+        return view('admin.info.create'); 
+    })->name('info.create');
 });
