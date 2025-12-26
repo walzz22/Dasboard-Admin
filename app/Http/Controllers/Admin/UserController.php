@@ -66,14 +66,60 @@ class UserController extends Controller
     // --------------------------------------------------------------------------
     // 4. SHOW, EDIT, UPDATE, DESTROY (CRUD Lainnya)
     // --------------------------------------------------------------------------
-    // ... (metode show, edit, update, destroy lainnya)
-    
-    // Perhatikan: Pastikan Anda menambahkan semua metode CRUD ini
-    // agar route::resource Anda tidak error (sudah ada di jawaban sebelumnya)
-    
-    // ...
-    public function show(User $user) { /* ... */ }
-    public function edit(User $user) { /* ... */ }
-    public function update(Request $request, User $user) { /* ... */ }
-    public function destroy(User $user) { /* ... */ }
+    // --------------------------------------------------------------------------
+    // 4. EDIT: Menampilkan Form Edit
+    // --------------------------------------------------------------------------
+    public function edit(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    // --------------------------------------------------------------------------
+    // 5. UPDATE: Menyimpan Perubahan Data
+    // --------------------------------------------------------------------------
+    public function update(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:15',
+            'department' => 'required|string|max:255',
+            'role' => 'required|in:admin,staff',
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'department' => $request->department,
+            'role' => $request->role,
+        ];
+
+        // Update password hanya jika diisi
+        if ($request->filled('password')) {
+            $request->validate(['password' => 'min:8']);
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('admin.users.index')
+                         ->with('success', 'Data pegawai berhasil diperbarui.');
+    }
+
+    // --------------------------------------------------------------------------
+    // 6. DESTROY: Menghapus Data
+    // --------------------------------------------------------------------------
+    public function destroy(User $user)
+    {
+        // Cegah hapus diri sendiri (opsional tapi disarankan)
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri saat sedang login.');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.index')
+                         ->with('success', 'Data pegawai berhasil dihapus.');
+    }
 }

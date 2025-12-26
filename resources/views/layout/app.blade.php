@@ -33,37 +33,40 @@
             <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
                 <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Menu Utama</p>
                 
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all group">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.dashboard') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600' }} rounded-xl transition-all group">
                     <span class="material-icons-outlined">home</span>
                     <span class="font-medium">Dashboard</span>
                 </a>
 
-                <a href="{{ route('admin.info.index') }}" class="flex items-center gap-3 px-4 py-3 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-200 transition-all">
+                <a href="{{ route('admin.info.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.info.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600' }} rounded-xl transition-all">
                     <span class="material-icons-outlined">campaign</span>
                     <span class="font-medium">Info Kantor</span>
                 </a>
 
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-all">
+                <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 {{ request()->routeIs('admin.users.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-slate-600 hover:bg-blue-50 hover:text-blue-600' }} rounded-xl transition-all">
                     <span class="material-icons-outlined">people</span>
                     <span class="font-medium">Data Pegawai</span>
                 </a>
 
                 <p class="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-6 mb-2">Pengaturan</p>
 
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all group">
-                    <span class="material-icons-outlined group-hover:rotate-12 transition-transform">logout</span>
-                    <span class="font-medium">Keluar</span>
-                </a>
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-xl transition-all group">
+                        <span class="material-icons-outlined group-hover:rotate-12 transition-transform">logout</span>
+                        <span class="font-medium">Keluar</span>
+                    </button>
+                </form>
             </nav>
 
             <div class="p-4 border-t border-slate-100 bg-slate-50/50">
                 <div class="flex items-center gap-3 px-2">
                     <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold border-2 border-white shadow-sm">
-                        A
+                        {{ substr(auth()->user()->name, 0, 1) }}
                     </div>
                     <div class="overflow-hidden">
-                        <p class="text-xs font-bold text-slate-800 truncate">Administrator</p>
-                        <p class="text-[10px] text-slate-500 truncate">admin@kantor.com</p>
+                        <p class="text-xs font-bold text-slate-800 truncate">{{ auth()->user()->name }}</p>
+                        <p class="text-[10px] text-slate-500 truncate">{{ auth()->user()->email }}</p>
                     </div>
                 </div>
             </div>

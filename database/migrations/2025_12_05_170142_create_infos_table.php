@@ -12,13 +12,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('infos', function (Blueprint $table) {
-            $table->uuid();
+            $table->uuid('id')->primary();
             $table->string('title'); // Judul Pengumuman
             $table->string('author'); // pembuat pengumuman
-            $table->string('type'); // tipe pengumuman 
+            $table->string('type')->default('General'); // tipe pengumuman 
             $table->date('published_at')->nullable(); // Tanggal Publikasi
             $table->enum('status', ['Terbit', 'Dijadwalkan', 'Diarsipkan', 'Draft'])->default('Draft');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->timestamps();
         });
     }
